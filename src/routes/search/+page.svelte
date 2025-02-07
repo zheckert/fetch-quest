@@ -5,6 +5,7 @@
 	let dogList = [];
 	let breeds = []; // List of all available breeds
 	let selectedBreed = ''; // Currently selected breed (we'll start with single selection)
+	let sortOrder = 'asc'; // Track sort direction
 	let loading = true;
 	let error = null;
 
@@ -26,7 +27,9 @@
 	async function searchDogs() {
 		try {
 			loading = true;
-			const params = { sort: 'breed:asc' };
+			const params = {
+				sort: `breed:${sortOrder}`
+			};
 
 			// Add breed filter if one is selected
 			if (selectedBreed) {
@@ -48,6 +51,11 @@
 		selectedBreed = event.target.value;
 		searchDogs();
 	}
+
+	function toggleSort() {
+		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+		searchDogs();
+	}
 </script>
 
 <h1>Available Dogs</h1>
@@ -62,6 +70,11 @@
 			{/each}
 		</select>
 	</label>
+	{#if !selectedBreed}
+		<button on:click={toggleSort}>
+			Sort {sortOrder === 'asc' ? 'ascending' : 'descending'}
+		</button>
+	{/if}
 </div>
 
 {#if loading}
@@ -123,10 +136,17 @@
 
 	.filters {
 		padding: 1rem;
+		display: flex;
+		gap: 1rem;
+		align-items: center;
 	}
 
 	select {
 		margin-left: 0.5rem;
 		padding: 0.25rem;
+	}
+
+	button {
+		padding: 0.25rem 0.5rem;
 	}
 </style>
