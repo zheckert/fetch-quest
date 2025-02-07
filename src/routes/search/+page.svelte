@@ -47,8 +47,9 @@
 			}
 
 			if (fromCursor) {
-				const cursorMatch = fromCursor.match(/from=(\d+)/);
-				params.from = cursorMatch ? cursorMatch[1] : fromCursor;
+				// Parse the cursor URL and get the 'from' parameter
+				const url = new URL(fromCursor, 'https://fetch-quest.netlify.app');
+				params.from = url.searchParams.get('from');
 			}
 
 			const searchResponse = await dogs.search(params);
