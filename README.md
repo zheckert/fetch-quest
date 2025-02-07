@@ -1,3 +1,4 @@
-# Fetch
+# Fetch Quest
+## Match with your favorite furry friends!
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Deployed here: https://fetch-quest.netlify.app/login
