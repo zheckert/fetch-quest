@@ -163,14 +163,17 @@
 	onSortToggle={toggleSort}
 />
 
-<Pagination
-	{currentPage}
-	{totalPages}
-	itemCount={dogList.length}
-	{prevPage}
-	{nextPage}
-	onPageChange={searchDogs}
-/>
+<!-- Only show pagination when not loading -->
+{#if !loading}
+	<Pagination
+		{currentPage}
+		{totalPages}
+		itemCount={dogList.length}
+		{prevPage}
+		{nextPage}
+		onPageChange={searchDogs}
+	/>
+{/if}
 
 {#if loading}
 	<div>Loading dogs...</div>
@@ -183,15 +186,6 @@
 		{/each}
 	</div>
 {/if}
-
-<Pagination
-	{currentPage}
-	{totalPages}
-	itemCount={dogList.length}
-	{prevPage}
-	{nextPage}
-	onPageChange={searchDogs}
-/>
 
 <style>
 	:global(body) {

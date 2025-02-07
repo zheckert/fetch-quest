@@ -20,6 +20,7 @@
 		padding: 0 1rem;
 		color: #666;
 		display: flex;
+		flex-wrap: wrap; /* Allow wrapping on mobile */
 		gap: 1rem;
 		align-items: center;
 		justify-content: flex-start;
@@ -36,5 +37,19 @@
 
 	span {
 		min-width: 200px;
+	}
+
+	/* Make text smaller on mobile */
+	@media (max-width: 600px) {
+		span {
+			font-size: 0.9rem;
+			min-width: 100%; /* Full width on mobile */
+			text-align: center;
+		}
+
+		.pagination-buttons {
+			width: 100%;
+			justify-content: center;
+		}
 	}
 </style>

@@ -27,12 +27,20 @@
 	.filters {
 		padding: 1rem;
 		display: flex;
+		flex-wrap: wrap;
 		gap: 1rem;
 		align-items: center;
 	}
 
+	label {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
 	select {
-		margin-left: 0.5rem;
+		max-width: 200px;
 		padding: 0.25rem;
 	}
 
@@ -47,5 +55,20 @@
 
 	button:hover {
 		background: #8f2380;
+	}
+
+	@media (max-width: 600px) {
+		.filters {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		select {
+			max-width: 100%;
+		}
+
+		label {
+			width: 100%;
+		}
 	}
 </style>
