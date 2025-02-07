@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { dogs } from '$lib/api';
+	import { favorites } from '$lib/stores/favoritesStore';
 
 	let dogList = [];
 	let breeds = []; // List of all available breeds
@@ -14,6 +15,9 @@
 	let nextPage = null;
 	let prevPage = null;
 	let pageSize = 20; // Number of dogs per page
+
+	let matchedDog = null;
+	let matchLoading = false; // Add loading state for match
 
 	// Load breeds and initial dogs when the page mounts
 	onMount(async () => {
@@ -72,9 +76,78 @@
 		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
 		searchDogs(); // Reset to first page on sort change
 	}
+
+	// Add function to handle favorite toggling
+	function handleFavoriteClick(dogId) {
+		favorites.toggleFavorite(dogId);
+	}
+
+	async function generateMatch() {
+		try {
+			if ($favorites.size === 0) {
+				error = 'Please favorite some dogs first!';
+				return;
+			}
+
+			matchLoading = true;
+			// Convert Set to Array for the API call
+			const favoriteIds = [...$favorites];
+			const response = await dogs.match(favoriteIds);
+
+			if (response.match) {
+				const [matchedDogDetails] = await dogs.getDogsById([response.match]);
+				matchedDog = matchedDogDetails;
+				// Clear favorites after successful match
+				favorites.clearFavorites();
+			}
+		} catch (err) {
+			error = 'Failed to generate match';
+			console.error('Match error:', err);
+		} finally {
+			matchLoading = false;
+		}
+	}
+
+	function closeMatch() {
+		matchedDog = null;
+	}
 </script>
 
 <h1>Available Dogs</h1>
+
+{#if matchedDog}
+	<div class="match-overlay">
+		<div class="match-content">
+			<h2>Congratulations!</h2>
+			<h3>You've been matched with {matchedDog.name}!</h3>
+			<div class="dog-card matched">
+				<img src={matchedDog.img} alt={matchedDog.name} />
+				<div class="dog-info">
+					<h3>{matchedDog.name}</h3>
+					<p><strong>Breed:</strong> {matchedDog.breed}</p>
+					<p><strong>Age:</strong> {matchedDog.age} {matchedDog.age === 1 ? 'year' : 'years'}</p>
+					<p><strong>Location:</strong> {matchedDog.zip_code}</p>
+				</div>
+			</div>
+			<button on:click={closeMatch}>Close</button>
+		</div>
+	</div>
+{/if}
+
+<div class="favorites-summary">
+	{#if $favorites.size > 0}
+		<p>{$favorites.size} {$favorites.size === 1 ? 'dog' : 'dogs'} favorited</p>
+		<button on:click={generateMatch} disabled={matchLoading}>
+			{#if matchLoading}
+				Generating Match...
+			{:else}
+				Generate Match!
+			{/if}
+		</button>
+	{:else}
+		<p>Favorite some dogs to generate a match!</p>
+	{/if}
+</div>
 
 <div class="filters">
 	<label>
@@ -109,6 +182,13 @@
 		{#each dogList as dog}
 			<div class="dog-card">
 				<img src={dog.img} alt={dog.name} />
+				<button
+					class="favorite-btn"
+					class:active={$favorites.has(dog.id)}
+					on:click={() => handleFavoriteClick(dog.id)}
+				>
+					{$favorites.has(dog.id) ? '❤️' : '🤍'}
+				</button>
 				<div class="dog-info">
 					<h3>{dog.name}</h3>
 					<p><strong>Breed:</strong> {dog.breed}</p>
@@ -138,6 +218,7 @@
 		border: 1px solid #ddd;
 		border-radius: 4px;
 		overflow: hidden;
+		position: relative;
 	}
 
 	.dog-info {
@@ -198,5 +279,45 @@
 	.results-info {
 		padding: 0 1rem;
 		color: #666;
+	}
+
+	.favorite-btn {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		cursor: pointer;
+		padding: 0.5rem;
+	}
+
+	.favorites-summary {
+		padding: 1rem;
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.match-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.8);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 1000;
+	}
+
+	.match-content {
+		background: white;
+		padding: 2rem;
+		border-radius: 8px;
+		max-width: 500px;
+		width: 90%;
+		text-align: center;
 	}
 </style>
