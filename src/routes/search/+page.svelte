@@ -3,17 +3,17 @@
 	import { dogs } from '$lib/api';
 
 	let dogList = [];
+	let breeds = []; // List of all available breeds
+	let selectedBreed = ''; // Currently selected breed (we'll start with single selection)
 	let loading = true;
 	let error = null;
 
-	// Load dogs when the page mounts
+	// Load breeds and initial dogs when the page mounts
 	onMount(async () => {
 		try {
-			// First get the IDs of dogs that match our search
-			const searchResponse = await dogs.search({ sort: 'breed:asc' });
-
-			// Then get the full dog details using those IDs
-			dogList = await dogs.getDogsById(searchResponse.resultIds);
+			// Get list of breeds first
+			breeds = await dogs.getBreeds();
+			await searchDogs();
 		} catch (err) {
 			error = 'Failed to load dogs';
 			console.error('Error:', err);
@@ -21,9 +21,48 @@
 			loading = false;
 		}
 	});
+
+	// Search function that considers the selected breed
+	async function searchDogs() {
+		try {
+			loading = true;
+			const params = { sort: 'breed:asc' };
+
+			// Add breed filter if one is selected
+			if (selectedBreed) {
+				params.breeds = [selectedBreed];
+			}
+
+			const searchResponse = await dogs.search(params);
+			dogList = await dogs.getDogsById(searchResponse.resultIds);
+		} catch (err) {
+			error = 'Failed to load dogs';
+			console.error('Error:', err);
+		} finally {
+			loading = false;
+		}
+	}
+
+	// Handle breed selection
+	function handleBreedChange(event) {
+		selectedBreed = event.target.value;
+		searchDogs();
+	}
 </script>
 
 <h1>Available Dogs</h1>
+
+<div class="filters">
+	<label>
+		Filter by breed:
+		<select value={selectedBreed} on:change={handleBreedChange}>
+			<option value="">All Breeds</option>
+			{#each breeds as breed}
+				<option value={breed}>{breed}</option>
+			{/each}
+		</select>
+	</label>
+</div>
 
 {#if loading}
 	<div>Loading dogs...</div>
@@ -80,5 +119,14 @@
 	.error {
 		color: red;
 		padding: 1rem;
+	}
+
+	.filters {
+		padding: 1rem;
+	}
+
+	select {
+		margin-left: 0.5rem;
+		padding: 0.25rem;
 	}
 </style>
