@@ -4,7 +4,6 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 
-	// Only run on client-side
 	$: if (browser && !$auth.isAuthenticated && !$page.url.pathname.includes('/login')) {
 		goto('/login');
 	}
@@ -42,7 +41,7 @@
 	}
 
 	nav {
-		padding: 0.5rem 1rem; /* Reduce top/bottom padding */
+		padding: 0.5rem 1rem;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

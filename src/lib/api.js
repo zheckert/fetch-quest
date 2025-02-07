@@ -4,7 +4,7 @@ const BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
 const api = axios.create({
 	baseURL: BASE_URL,
-	withCredentials: true // Required for the auth cookie to work
+	withCredentials: true
 });
 
 export const auth = {

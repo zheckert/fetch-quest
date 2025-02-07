@@ -10,9 +10,9 @@
 	import FilterControls from '$lib/components/FilterControls.svelte';
 
 	let dogList = [];
-	let breeds = []; // List of all available breeds
-	let selectedBreed = ''; // Currently selected breed
-	let sortOrder = 'asc'; // Track sort direction
+	let breeds = [];
+	let selectedBreed = '';
+	let sortOrder = 'asc';
 	let loading = true;
 	let error = null;
 
@@ -20,21 +20,17 @@
 	let currentPage = null;
 	let nextPage = null;
 	let prevPage = null;
-	let pageSize = 20; // Number of dogs per page
+	let pageSize = 20;
 
 	let matchedDog = null;
-	let matchLoading = false; // Add loading state for match
+	let matchLoading = false;
 
-	// Add totalPages to our state
 	let totalPages = 0;
 
-	// Add match history state
 	let matchHistory = [];
 
-	// Load breeds and initial dogs when the page mounts
 	onMount(async () => {
 		try {
-			// Get list of breeds first
 			breeds = await dogs.getBreeds();
 			await searchDogs();
 		} catch (err) {
@@ -45,7 +41,6 @@
 		}
 	});
 
-	// Search function that considers the selected breed
 	async function searchDogs(fromCursor = null) {
 		try {
 			loading = true;
@@ -64,14 +59,13 @@
 				params.from = fromValue;
 				currentPage = Math.floor(Number(fromValue) / pageSize) + 1;
 			} else {
-				currentPage = 1; // First page
+				currentPage = 1;
 			}
 
 			const searchResponse = await dogs.search(params);
 			dogList = await dogs.getDogsById(searchResponse.resultIds);
 			totalPages = Math.ceil(searchResponse.total / pageSize);
 
-			// Update pagination state
 			nextPage = searchResponse.next;
 			prevPage = searchResponse.prev;
 		} catch (err) {
@@ -82,18 +76,16 @@
 		}
 	}
 
-	// Handle breed selection
 	function handleBreedChange(event) {
 		selectedBreed = event.target.value;
-		searchDogs(); // Reset to first page on breed change
+		searchDogs();
 	}
 
 	function toggleSort() {
 		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-		searchDogs(); // Reset to first page on sort change
+		searchDogs();
 	}
 
-	// Add function to handle favorite toggling
 	function handleFavoriteClick(dogId) {
 		favorites.toggleFavorite(dogId);
 	}
@@ -112,7 +104,7 @@
 			if (response.match) {
 				const [matchedDogDetails] = await dogs.getDogsById([response.match]);
 				matchedDog = matchedDogDetails;
-				matchHistory = [...matchHistory, matchedDogDetails]; // Add to history
+				matchHistory = [...matchHistory, matchedDogDetails];
 				favorites.clearFavorites();
 			}
 		} catch (err) {
@@ -163,7 +155,6 @@
 	onSortToggle={toggleSort}
 />
 
-<!-- Only show pagination when not loading -->
 {#if !loading}
 	<Pagination
 		{currentPage}
