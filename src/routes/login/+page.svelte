@@ -29,7 +29,7 @@
 </script>
 
 <div class="login-container">
-	<h1>Welcome to Fetch!</h1>
+	<h1>Welcome to FetchQuest!</h1>
 	<h3 class="intro">
 		Let us help you match with your ultimate furry friend! Enter your details below to get started.
 	</h3>

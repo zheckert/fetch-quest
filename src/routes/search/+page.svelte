@@ -203,7 +203,11 @@
 
 <div class="results-info">
 	{#if !loading && !error}
-		Showing {dogList.length} dogs (page {currentPage} of {totalPages})
+		<span>Showing {dogList.length} dogs (page {currentPage} of {totalPages})</span>
+		<div class="pagination-buttons">
+			<button disabled={!prevPage} on:click={() => searchDogs(prevPage)}> Previous </button>
+			<button disabled={!nextPage} on:click={() => searchDogs(nextPage)}> Next </button>
+		</div>
 	{/if}
 </div>
 
@@ -232,13 +236,18 @@
 			</div>
 		{/each}
 	</div>
-
-	<!-- Pagination controls -->
-	<div class="pagination">
-		<button disabled={!prevPage} on:click={() => searchDogs(prevPage)}> Previous </button>
-		<button disabled={!nextPage} on:click={() => searchDogs(nextPage)}> Next </button>
-	</div>
 {/if}
+
+<!-- Add bottom pagination -->
+<div class="results-info bottom">
+	{#if !loading && !error}
+		<span>Showing {dogList.length} dogs (page {currentPage} of {totalPages})</span>
+		<div class="pagination-buttons">
+			<button disabled={!prevPage} on:click={() => searchDogs(prevPage)}> Previous </button>
+			<button disabled={!nextPage} on:click={() => searchDogs(nextPage)}> Next </button>
+		</div>
+	{/if}
+</div>
 
 <style>
 	:global(body) {
@@ -342,25 +351,26 @@
 		padding: 0.25rem 0.5rem;
 	}
 
-	.pagination {
-		padding: 1rem;
-		display: flex;
-		gap: 1rem;
-		justify-content: center;
-	}
-
-	.pagination button {
-		padding: 0.5rem 1rem;
-	}
-
-	.pagination button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
 	.results-info {
 		padding: 0 1rem;
 		color: #666;
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		justify-content: flex-start; /* Left align */
+	}
+
+	.pagination-buttons {
+		display: flex;
+		gap: 0.5rem; /* Smaller gap between buttons */
+	}
+
+	.results-info button {
+		padding: 0.25rem 0.75rem;
+	}
+
+	.results-info span {
+		min-width: 200px;
 	}
 
 	.favorite-btn {
@@ -418,11 +428,11 @@
 	}
 
 	.match-history {
-		padding: 1rem;
+		padding: 0 1rem; /* Remove top padding, keep horizontal padding */
 	}
 
 	.match-history h2 {
-		margin-bottom: 1rem;
+		margin: 0.5rem 0 1rem 0; /* Reduce top margin, keep bottom margin */
 	}
 
 	.match-grid {
@@ -482,5 +492,9 @@
 	.remove-match-btn:hover {
 		background: rgba(0, 0, 0, 0.8); /* Darker on hover */
 		color: #fba919; /* Keep yellow hover color */
+	}
+
+	.results-info.bottom {
+		margin-top: 1rem; /* Add some space above bottom controls */
 	}
 </style>
