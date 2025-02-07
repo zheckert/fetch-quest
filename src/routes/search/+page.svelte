@@ -19,6 +19,12 @@
 	let matchedDog = null;
 	let matchLoading = false; // Add loading state for match
 
+	// Add totalPages to our state
+	let totalPages = 0;
+
+	// Add match history state
+	let matchHistory = [];
+
 	// Load breeds and initial dogs when the page mounts
 	onMount(async () => {
 		try {
@@ -47,18 +53,21 @@
 			}
 
 			if (fromCursor) {
-				// Parse the cursor URL and get the 'from' parameter
 				const url = new URL(fromCursor, 'https://fetch-quest.netlify.app');
-				params.from = url.searchParams.get('from');
+				const fromValue = url.searchParams.get('from');
+				params.from = fromValue;
+				currentPage = Math.floor(Number(fromValue) / pageSize) + 1;
+			} else {
+				currentPage = 1; // First page
 			}
 
 			const searchResponse = await dogs.search(params);
 			dogList = await dogs.getDogsById(searchResponse.resultIds);
+			totalPages = Math.ceil(searchResponse.total / pageSize);
 
 			// Update pagination state
 			nextPage = searchResponse.next;
 			prevPage = searchResponse.prev;
-			currentPage = fromCursor;
 		} catch (err) {
 			error = 'Failed to load dogs';
 			console.error('Error:', err);
@@ -91,14 +100,13 @@
 			}
 
 			matchLoading = true;
-			// Convert Set to Array for the API call
 			const favoriteIds = [...$favorites];
 			const response = await dogs.match(favoriteIds);
 
 			if (response.match) {
 				const [matchedDogDetails] = await dogs.getDogsById([response.match]);
 				matchedDog = matchedDogDetails;
-				// Clear favorites after successful match
+				matchHistory = [...matchHistory, matchedDogDetails]; // Add to history
 				favorites.clearFavorites();
 			}
 		} catch (err) {
@@ -112,8 +120,49 @@
 	function closeMatch() {
 		matchedDog = null;
 	}
+
+	function removeMatch(matchToRemove) {
+		matchHistory = matchHistory.filter((match) => match.id !== matchToRemove.id);
+	}
 </script>
 
+<!-- First the favorites and matches sections -->
+<div class="favorites-summary">
+	{#if $favorites.size > 0}
+		<p>{$favorites.size} {$favorites.size === 1 ? 'dog' : 'dogs'} favorited</p>
+		<button on:click={generateMatch} disabled={matchLoading}>
+			{#if matchLoading}
+				Generating Match...
+			{:else}
+				Generate Match!
+			{/if}
+		</button>
+	{:else}
+		<p>Favorite some dogs to generate a match!</p>
+	{/if}
+</div>
+
+{#if matchHistory.length > 0}
+	<div class="match-history">
+		<h2>Your Matches</h2>
+		<div class="match-grid">
+			{#each matchHistory as match}
+				<div class="match-card">
+					<button class="remove-match-btn" on:click={() => removeMatch(match)} title="Remove match">
+						&times;
+					</button>
+					<img src={match.img} alt={match.name} />
+					<div class="match-info">
+						<h3>{match.name}</h3>
+						<p>{match.breed}</p>
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
+{/if}
+
+<!-- Then the available dogs section -->
 <h1>Available Dogs</h1>
 
 {#if matchedDog}
@@ -135,21 +184,6 @@
 	</div>
 {/if}
 
-<div class="favorites-summary">
-	{#if $favorites.size > 0}
-		<p>{$favorites.size} {$favorites.size === 1 ? 'dog' : 'dogs'} favorited</p>
-		<button on:click={generateMatch} disabled={matchLoading}>
-			{#if matchLoading}
-				Generating Match...
-			{:else}
-				Generate Match!
-			{/if}
-		</button>
-	{:else}
-		<p>Favorite some dogs to generate a match!</p>
-	{/if}
-</div>
-
 <div class="filters">
 	<label>
 		Filter by breed:
@@ -169,8 +203,7 @@
 
 <div class="results-info">
 	{#if !loading && !error}
-		Showing {dogList.length} dogs {#if currentPage}(page {Math.floor(currentPage / pageSize) +
-				1}){/if}
+		Showing {dogList.length} dogs (page {currentPage} of {totalPages})
 	{/if}
 </div>
 
@@ -342,7 +375,7 @@
 	}
 
 	.favorites-summary {
-		padding: 1rem;
+		padding: 0.5rem 1rem;
 		display: flex;
 		gap: 1rem;
 		align-items: center;
@@ -373,5 +406,81 @@
 	h1 {
 		padding: 0 1rem; /* Match other content padding */
 		margin-bottom: 1rem;
+	}
+
+	.match-content button {
+		margin-top: 1.5rem; /* Add space above the close button */
+	}
+
+	/* ... or if you want to be more specific ... */
+	.match-content > button:last-child {
+		margin-top: 1.5rem;
+	}
+
+	.match-history {
+		padding: 1rem;
+	}
+
+	.match-history h2 {
+		margin-bottom: 1rem;
+	}
+
+	.match-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
+	}
+
+	.match-card {
+		border: 2px solid #7d1f70;
+		border-radius: 4px;
+		overflow: hidden;
+		background: white;
+		position: relative; /* For absolute positioning of remove button */
+	}
+
+	.match-card img {
+		height: 150px;
+	}
+
+	.match-info {
+		padding: 0.5rem;
+		text-align: center;
+	}
+
+	.match-info h3 {
+		margin: 0;
+		font-size: 1.1rem;
+	}
+
+	.match-info p {
+		margin: 0.25rem 0 0 0;
+		color: #666;
+	}
+
+	.remove-match-btn {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		background: rgba(0, 0, 0, 0.6);
+		border: none;
+		font-size: 1.75rem; /* Smaller size */
+		cursor: pointer;
+		padding: 0 0 4px 0; /* top right bottom left */
+		width: 24px; /* Smaller width */
+		height: 24px; /* Smaller height */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 0;
+		color: white;
+		z-index: 1;
+		border-radius: 4px;
+		transform: translateY(-1px); /* Slight vertical adjustment */
+	}
+
+	.remove-match-btn:hover {
+		background: rgba(0, 0, 0, 0.8); /* Darker on hover */
+		color: #fba919; /* Keep yellow hover color */
 	}
 </style>

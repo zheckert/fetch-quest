@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { auth } from '$lib/stores/authStore';
 	import { auth as authApi } from '$lib/api';
 	import { goto } from '$app/navigation';
@@ -6,6 +7,13 @@
 	let name = '';
 	let email = '';
 	let error = null;
+
+	// Redirect if already logged in
+	onMount(() => {
+		if ($auth.isAuthenticated) {
+			goto('/search');
+		}
+	});
 
 	async function handleSubmit() {
 		try {

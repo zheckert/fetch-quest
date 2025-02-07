@@ -20,6 +20,7 @@
 </script>
 
 <nav class:authenticated={$auth.isAuthenticated}>
+	<span class="logo">FetchQuest</span>
 	{#if $auth.isAuthenticated}
 		<div class="user-info">
 			Welcome, {$auth.user.name}
@@ -33,8 +34,18 @@
 </main>
 
 <style>
+	.logo {
+		font-family: 'Merriweather', serif;
+		color: #7d1f70;
+		font-size: 1.5rem;
+		font-weight: bold;
+	}
+
 	nav {
-		padding: 1rem;
+		padding: 0.5rem 1rem; /* Reduce top/bottom padding */
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	nav.authenticated {
