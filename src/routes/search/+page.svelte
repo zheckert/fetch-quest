@@ -208,6 +208,54 @@
 {/if}
 
 <style>
+	:global(body) {
+		background: white;
+		color: black;
+		font-family: 'Roboto', sans-serif;
+	}
+
+	h1,
+	h2,
+	h3 {
+		font-family: 'Merriweather', serif;
+	}
+
+	button {
+		background: #7d1f70;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		transition: background 0.2s;
+	}
+
+	button:hover {
+		background: #8f2380;
+	}
+
+	.favorite-btn {
+		/* Keep transparent background for heart buttons */
+		background: none;
+	}
+
+	.dog-card {
+		border: 1px solid #ddd;
+		background: white;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.match-content {
+		border: 2px solid #7d1f70;
+	}
+
+	.favorites-summary button {
+		background: #fba919;
+		color: black;
+	}
+
+	.favorites-summary button:hover {
+		background: #fbb437;
+	}
+
 	.dog-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
