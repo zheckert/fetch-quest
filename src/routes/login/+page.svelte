@@ -22,22 +22,24 @@
 
 <div class="login-container">
 	<h1>Welcome to Fetch</h1>
+	<p class="intro">Find your perfect furry friend! Enter your details below to get started.</p>
+
 	<form on:submit|preventDefault={handleSubmit}>
 		<div class="form-group">
-			<label for="name">Name:</label>
-			<input type="text" id="name" bind:value={name} required />
+			<label for="name">Your Name:</label>
+			<input type="text" id="name" bind:value={name} required placeholder="Enter your name" />
 		</div>
 
 		<div class="form-group">
-			<label for="email">Email:</label>
-			<input type="email" id="email" bind:value={email} required />
+			<label for="email">Your Email:</label>
+			<input type="email" id="email" bind:value={email} required placeholder="Enter your email" />
 		</div>
 
 		{#if error}
 			<div class="error">{error}</div>
 		{/if}
 
-		<button type="submit">Login</button>
+		<button type="submit">Start Searching</button>
 	</form>
 </div>
 
@@ -46,6 +48,10 @@
 		max-width: 400px;
 		margin: 2rem auto;
 		padding: 1rem;
+	}
+
+	.intro {
+		margin-bottom: 2rem;
 	}
 
 	.form-group {
