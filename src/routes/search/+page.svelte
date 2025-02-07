@@ -30,27 +30,55 @@
 {:else if error}
 	<div class="error">{error}</div>
 {:else}
-	<ul>
+	<div class="dog-grid">
 		{#each dogList as dog}
-			<li>
-				<h3>{dog.name}</h3>
-				<p>{dog.breed}, {dog.age} years old</p>
-			</li>
+			<div class="dog-card">
+				<img src={dog.img} alt={dog.name} />
+				<div class="dog-info">
+					<h3>{dog.name}</h3>
+					<p><strong>Breed:</strong> {dog.breed}</p>
+					<p><strong>Age:</strong> {dog.age} {dog.age === 1 ? 'year' : 'years'}</p>
+					<p><strong>Location:</strong> {dog.zip_code}</p>
+				</div>
+			</div>
 		{/each}
-	</ul>
+	</div>
 {/if}
 
 <style>
+	.dog-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: 1rem;
+		padding: 1rem;
+	}
+
+	.dog-card {
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		overflow: hidden;
+	}
+
+	.dog-info {
+		padding: 1rem;
+	}
+
+	img {
+		width: 100%;
+		height: 200px;
+		object-fit: cover;
+	}
+
+	h3 {
+		margin: 0 0 0.5rem 0;
+	}
+
+	p {
+		margin: 0.25rem 0;
+	}
+
 	.error {
 		color: red;
-	}
-
-	ul {
-		list-style: none;
-		padding: 0;
-	}
-
-	li {
-		margin-bottom: 1rem;
+		padding: 1rem;
 	}
 </style>
