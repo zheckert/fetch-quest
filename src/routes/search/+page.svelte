@@ -4,10 +4,16 @@
 
 	let dogList = [];
 	let breeds = []; // List of all available breeds
-	let selectedBreed = ''; // Currently selected breed (we'll start with single selection)
+	let selectedBreed = ''; // Currently selected breed
 	let sortOrder = 'asc'; // Track sort direction
 	let loading = true;
 	let error = null;
+
+	// Pagination state
+	let currentPage = null;
+	let nextPage = null;
+	let prevPage = null;
+	let pageSize = 20; // Number of dogs per page
 
 	// Load breeds and initial dogs when the page mounts
 	onMount(async () => {
@@ -24,20 +30,30 @@
 	});
 
 	// Search function that considers the selected breed
-	async function searchDogs() {
+	async function searchDogs(fromCursor = null) {
 		try {
 			loading = true;
 			const params = {
-				sort: `breed:${sortOrder}`
+				sort: `breed:${sortOrder}`,
+				size: pageSize
 			};
 
-			// Add breed filter if one is selected
 			if (selectedBreed) {
 				params.breeds = [selectedBreed];
 			}
 
+			if (fromCursor) {
+				const cursorMatch = fromCursor.match(/from=(\d+)/);
+				params.from = cursorMatch ? cursorMatch[1] : fromCursor;
+			}
+
 			const searchResponse = await dogs.search(params);
 			dogList = await dogs.getDogsById(searchResponse.resultIds);
+
+			// Update pagination state
+			nextPage = searchResponse.next;
+			prevPage = searchResponse.prev;
+			currentPage = fromCursor;
 		} catch (err) {
 			error = 'Failed to load dogs';
 			console.error('Error:', err);
@@ -49,12 +65,12 @@
 	// Handle breed selection
 	function handleBreedChange(event) {
 		selectedBreed = event.target.value;
-		searchDogs();
+		searchDogs(); // Reset to first page on breed change
 	}
 
 	function toggleSort() {
 		sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-		searchDogs();
+		searchDogs(); // Reset to first page on sort change
 	}
 </script>
 
@@ -77,6 +93,13 @@
 	{/if}
 </div>
 
+<div class="results-info">
+	{#if !loading && !error}
+		Showing {dogList.length} dogs {#if currentPage}(page {Math.floor(currentPage / pageSize) +
+				1}){/if}
+	{/if}
+</div>
+
 {#if loading}
 	<div>Loading dogs...</div>
 {:else if error}
@@ -94,6 +117,12 @@
 				</div>
 			</div>
 		{/each}
+	</div>
+
+	<!-- Pagination controls -->
+	<div class="pagination">
+		<button disabled={!prevPage} on:click={() => searchDogs(prevPage)}> Previous </button>
+		<button disabled={!nextPage} on:click={() => searchDogs(nextPage)}> Next </button>
 	</div>
 {/if}
 
@@ -148,5 +177,26 @@
 
 	button {
 		padding: 0.25rem 0.5rem;
+	}
+
+	.pagination {
+		padding: 1rem;
+		display: flex;
+		gap: 1rem;
+		justify-content: center;
+	}
+
+	.pagination button {
+		padding: 0.5rem 1rem;
+	}
+
+	.pagination button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.results-info {
+		padding: 0 1rem;
+		color: #666;
 	}
 </style>
