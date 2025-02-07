@@ -19,7 +19,7 @@
 	}
 </script>
 
-<nav>
+<nav class:authenticated={$auth.isAuthenticated}>
 	{#if $auth.isAuthenticated}
 		<div class="user-info">
 			Welcome, {$auth.user.name}
@@ -37,13 +37,20 @@
 		padding: 1rem;
 	}
 
-	main {
-		padding: 1rem;
+	nav.authenticated {
+		border-bottom: 1px solid #ddd;
 	}
 
 	.user-info {
 		display: flex;
 		gap: 1rem;
 		align-items: center;
+		justify-content: flex-end;
+	}
+
+	main {
+		padding: 1rem;
+		max-width: 1200px;
+		margin: 0 auto;
 	}
 </style>

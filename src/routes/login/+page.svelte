@@ -21,8 +21,10 @@
 </script>
 
 <div class="login-container">
-	<h1>Welcome to Fetch</h1>
-	<p class="intro">Find your perfect furry friend! Enter your details below to get started.</p>
+	<h1>Welcome to Fetch!</h1>
+	<h3 class="intro">
+		Let us help you match with your ultimate furry friend! Enter your details below to get started.
+	</h3>
 
 	<form on:submit|preventDefault={handleSubmit}>
 		<div class="form-group">
@@ -44,6 +46,17 @@
 </div>
 
 <style>
+	:global(body) {
+		background: white;
+		color: black;
+		font-family: 'Roboto', sans-serif;
+	}
+
+	h1,
+	h3 {
+		font-family: 'Merriweather', serif;
+	}
+
 	.login-container {
 		max-width: 400px;
 		margin: 2rem auto;
@@ -52,28 +65,49 @@
 
 	.intro {
 		margin-bottom: 2rem;
+		color: #666;
 	}
 
 	.form-group {
+		text-align: left;
 		margin-bottom: 1rem;
 	}
 
 	label {
 		display: block;
 		margin-bottom: 0.5rem;
+		font-weight: 500;
 	}
 
 	input {
 		width: 100%;
 		padding: 0.5rem;
+		border: 1px solid #ddd;
+		border-radius: 4px;
 	}
 
 	button {
+		max-width: 200px;
 		width: 100%;
-		padding: 0.5rem;
+		padding: 0.75rem;
+		background: #7d1f70;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-family: 'Roboto', sans-serif;
+		transition: background 0.2s;
+	}
+
+	button:hover {
+		background: #8f2380;
 	}
 
 	.error {
+		color: red;
 		margin-bottom: 1rem;
+	}
+
+	form {
+		text-align: center;
 	}
 </style>

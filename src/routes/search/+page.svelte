@@ -369,4 +369,9 @@
 		width: 90%;
 		text-align: center;
 	}
+
+	h1 {
+		padding: 0 1rem; /* Match other content padding */
+		margin-bottom: 1rem;
+	}
 </style>
